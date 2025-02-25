@@ -1,5 +1,6 @@
 import React from 'react';
 import './Footer.css';
+import { FaTwitter, FaLinkedin, FaGithub } from 'react-icons/fa';
 
 const Footer = () => {
   return (
@@ -7,22 +8,23 @@ const Footer = () => {
       <div className="footer-content">
         <div className="footer-left">
           <div className="footer-text">
-            © 2024 MedAI Assistant. All rights reserved.
+            © 2024 MedAI Assistant
           </div>
           <div className="medical-disclaimer">
-            Disclaimer: This application is intended to assist medical professionals and should not be used as a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider.
+            For information only. Not for medical advice.
           </div>
         </div>
         <div className="footer-right">
           <div className="social-links">
             <a href="https://twitter.com/medai" target="_blank" rel="noopener noreferrer">
-              Twitter
+              <FaTwitter className="social-icon" /> Twitter
             </a>
             <a href="https://linkedin.com/company/medai" target="_blank" rel="noopener noreferrer">
-              LinkedIn
+              <FaLinkedin className="social-icon" /> LinkedIn
             </a>
-            <a href="/privacy-policy">Privacy Policy</a>
-            <a href="/terms">Terms of Use</a>
+            <a href="https://github.com/krizniv" target="_blank" rel="noopener noreferrer">
+              <FaGithub className="social-icon" /> Krizniv
+            </a>
           </div>
         </div>
       </div>

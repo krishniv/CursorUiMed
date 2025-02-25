@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header/Header';
 import Sidebar from './components/Sidebar/Sidebar';
@@ -10,18 +10,33 @@ import ImageDiagnosis from './components/ImageDiagnosis/ImageDiagnosis';
 import './styles/main.css';
 
 function App() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  
+  // Handle responsive sidebar on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSidebarOpen(window.innerWidth > 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+  
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+  };
 
   return (
     <Router>
-      <div className={`app ${isSidebarOpen ? '' : 'sidebar-collapsed'}`}>
+      <div className={`app ${isSidebarOpen ? '' : 'sidebar-collapsed'} ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
         <Sidebar isOpen={isSidebarOpen} onToggle={toggleSidebar} />
         <div className="content-wrapper">
-          <Header onMenuClick={toggleSidebar} />
+          <Header onMenuClick={toggleSidebar} onThemeToggle={toggleDarkMode} isDarkMode={isDarkMode} />
           <main className="main-content">
             <Routes>
               <Route path="/" element={<Home />} />
@@ -30,7 +45,7 @@ function App() {
               <Route path="/diagnosis" element={<ImageDiagnosis />} />
             </Routes>
           </main>
-          <Footer />
+          <Footer isDarkMode={isDarkMode} />
         </div>
       </div>
     </Router>
