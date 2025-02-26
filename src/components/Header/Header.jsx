@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import './Header.css';
 
-const Header = () => {
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
+const Header = ({ isAuthenticated, user, onLogout }) => {
+  const navigate = useNavigate();
+  
+  const handleLogout = () => {
+    onLogout();
+    navigate('/');
+  };
 
   return (
     <header className="header">
@@ -12,30 +17,29 @@ const Header = () => {
       </div>
       <div className="header-right">
         <div className="header-actions">
-          <button className="notification-btn">
-            <span className="notification-icon">🔔</span>
-            <span className="notification-badge">3</span>
-          </button>
-          <div className="profile-container">
-            <button 
-              className="profile-btn"
-              onClick={() => setIsProfileOpen(!isProfileOpen)}
-            >
-              <img 
-                src="https://via.placeholder.com/40" 
-                alt="Profile" 
-                className="profile-image"
-              />
-            </button>
-            {isProfileOpen && (
-              <div className="profile-dropdown">
-                <Link to="/profile" className="dropdown-item">Profile</Link>
-                <Link to="/settings" className="dropdown-item">Settings</Link>
-                <hr />
-                <Link to="/logout" className="dropdown-item logout">Logout</Link>
+          {isAuthenticated ? (
+            <>
+              <button className="notification-btn">
+                <span className="notification-icon">🔔</span>
+                <span className="notification-badge">3</span>
+              </button>
+              <div className="profile-container">
+                <div className="user-welcome">
+                  Welcome, {user.username}!
+                </div>
+                <button 
+                  className="logout-button"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
               </div>
-            )}
-          </div>
+            </>
+          ) : (
+            <Link to="/login" className="login-button">
+              Login
+            </Link>
+          )}
         </div>
       </div>
     </header>

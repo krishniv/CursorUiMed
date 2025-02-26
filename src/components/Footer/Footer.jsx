@@ -10,9 +10,7 @@ const Footer = () => {
           <div className="footer-text">
             © 2024 MedAI Assistant
           </div>
-          <div className="medical-disclaimer">
-            For information only. Not for medical advice.
-          </div>
+          
         </div>
         <div className="footer-right">
           <div className="social-links">

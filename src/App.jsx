@@ -4,14 +4,31 @@ import Header from './components/Header/Header';
 import Sidebar from './components/Sidebar/Sidebar';
 import Footer from './components/Footer/Footer';
 import Home from './pages/Home';
-import Quiz from './components/Quiz/Quiz';
+import Login from './pages/Login';
+import Quiz from './components/Quiz/Quiz'; 
 import Chatbot from './components/Chatbot/Chatbot';
 import ImageDiagnosis from './components/ImageDiagnosis/ImageDiagnosis';
+import ProtectedRoute from './components/Auth/ProtectedRoute';
 import './styles/main.css';
 
 function App() {
+  // Basic state management
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  
+  // Authentication state
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+  
+  // Check if user was previously logged in (using localStorage)
+  useEffect(() => {
+    const savedUser = localStorage.getItem('medicalAssistantUser');
+    if (savedUser) {
+      const parsedUser = JSON.parse(savedUser);
+      setUser(parsedUser);
+      setIsAuthenticated(true);
+    }
+  }, []);
   
   // Handle responsive sidebar on window resize
   useEffect(() => {
@@ -30,19 +47,54 @@ function App() {
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };
+  
+  // Authentication functions
+  const handleLogin = (userData) => {
+    setUser(userData);
+    setIsAuthenticated(true);
+    localStorage.setItem('medicalAssistantUser', JSON.stringify(userData));
+  };
+  
+  const handleLogout = () => {
+    setUser(null);
+    setIsAuthenticated(false);
+    localStorage.removeItem('medicalAssistantUser');
+  };
 
   return (
     <Router>
       <div className={`app ${isSidebarOpen ? '' : 'sidebar-collapsed'} ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
         <Sidebar isOpen={isSidebarOpen} onToggle={toggleSidebar} />
         <div className="content-wrapper">
-          <Header onMenuClick={toggleSidebar} onThemeToggle={toggleDarkMode} isDarkMode={isDarkMode} />
+          <Header 
+            onMenuClick={toggleSidebar} 
+            onThemeToggle={toggleDarkMode} 
+            isDarkMode={isDarkMode}
+            isAuthenticated={isAuthenticated}
+            user={user}
+            onLogout={handleLogout}
+          />
           <main className="main-content">
             <Routes>
-              <Route path="/" element={<Home />} />
+              <Route path="/" element={<Home isAuthenticated={isAuthenticated} />} />
+              <Route path="/login" element={<Login onLogin={handleLogin} />} />
               <Route path="/quiz" element={<Quiz />} />
-              <Route path="/chatbot" element={<Chatbot />} />
-              <Route path="/diagnosis" element={<ImageDiagnosis />} />
+              <Route 
+                path="/chatbot" 
+                element={
+                  <ProtectedRoute isAuthenticated={isAuthenticated}>
+                    <Chatbot />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/diagnosis" 
+                element={
+                  <ProtectedRoute isAuthenticated={isAuthenticated}>
+                    <ImageDiagnosis />
+                  </ProtectedRoute>
+                } 
+              />
             </Routes>
           </main>
           <Footer isDarkMode={isDarkMode} />

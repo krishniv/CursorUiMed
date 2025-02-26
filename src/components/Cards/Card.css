@@ -1,7 +1,7 @@
 .card {
   background-color: white;
-  border-radius: 12px;
-  padding: 32px;
+  border-radius: 10px;
+  padding: 20px;
   color: var(--text-color);
   transition: all 0.3s ease;
   display: flex;
@@ -10,22 +10,25 @@
   text-align: center;
   position: relative;
   border: 1px solid rgba(0, 0, 0, 0.1);
-  min-height: 320px;
+  min-height: 280px;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   border-color: var(--primary-color);
 }
 
 .card-icon {
-  font-size: 3rem;
-  margin-bottom: 24px;
+  font-size: 2.5rem;
+  margin-bottom: 16px;
   color: var(--primary-color);
   background: var(--background-color);
-  width: 80px;
-  height: 80px;
+  width: 64px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -33,22 +36,22 @@
 }
 
 .card-title {
-  margin-bottom: 16px;
-  font-size: 1.5rem;
+  margin-bottom: 12px;
+  font-size: 1.3rem;
   color: var(--primary-color);
   font-weight: 600;
 }
 
 .card-description {
   color: var(--text-color);
-  font-size: 1rem;
-  line-height: 1.6;
-  margin-bottom: 32px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 20px;
   flex-grow: 1;
 }
 
 .card-button {
-  padding: 12px 24px;
+  padding: 10px 20px;
   background-color: var(--primary-color);
   color: white;
   text-decoration: none;
@@ -57,6 +60,7 @@
   transition: all 0.2s;
   width: 100%;
   text-align: center;
+  font-size: 0.95rem;
 }
 
 .card-button:hover {
@@ -66,8 +70,8 @@
 
 .card-arrow {
   position: absolute;
-  bottom: 24px;
-  font-size: 1.5rem;
+  bottom: 20px;
+  font-size: 1.3rem;
   color: var(--accent-color);
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -77,9 +81,89 @@
   opacity: 1;
 }
 
+/* Quiz configuration styles */
+.quiz-config {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.questions-selector {
+  width: 100%;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.quiz-config label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+
+.question-input {
+  padding: 8px 10px;
+  border: 2px solid var(--primary-color);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  width: 70px;
+  text-align: center;
+  margin: 0 auto 4px;
+  display: block;
+}
+
+.question-input:focus {
+  outline: none;
+  border-color: var(--secondary-color);
+}
+
+.question-range {
+  display: block;
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.quiz-button {
+  margin-top: 6px;
+}
+
 @media (max-width: 768px) {
   .card {
     min-height: auto;
-    padding: 24px;
+    padding: 18px;
+    max-width: 100%;
   }
-} 
+}
+
+/* Add these styles to your existing Card.css */
+
+/* Delete or comment out these classes:
+.card-locked {
+  position: relative;
+  overflow: hidden;
+  opacity: 0.9;
+}
+
+.card-lock-overlay {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  z-index: 2;
+}
+
+.locked-button {
+  background-color: #757575 !important;
+}
+
+.locked-button:hover {
+  background-color: #616161 !important;
+}
+*/ 
