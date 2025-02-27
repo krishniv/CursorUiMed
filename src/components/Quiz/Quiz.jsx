@@ -13,137 +13,91 @@ const Quiz = () => {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [isAnswerSelected, setIsAnswerSelected] = useState(false);
   const [correctAnswerIndex, setCorrectAnswerIndex] = useState(null);
-
-  // Full list of medical questions with images
-  const allQuestions = [
-    {
-      questionText: 'What is the organ shown in this image?',
-      answerOptions: [
-        { answerText: 'Heart', isCorrect: true },
-        { answerText: 'Kidney', isCorrect: false },
-        { answerText: 'Liver', isCorrect: false },
-        { answerText: 'Lung', isCorrect: false },
-      ],
-      imageUrl: 'https://via.placeholder.com/600x500?text=Heart+Anatomy',
-      explanation: 'The image shows a human heart, which is a muscular organ responsible for pumping blood throughout the body.'
-    },
-    {
-      questionText: 'Which bone is this?',
-      answerOptions: [
-        { answerText: 'Tibia', isCorrect: false },
-        { answerText: 'Femur', isCorrect: true },
-        { answerText: 'Humerus', isCorrect: false },
-        { answerText: 'Radius', isCorrect: false },
-      ],
-      imageUrl: 'https://via.placeholder.com/600x500?text=Femur+Bone',
-      explanation: 'This is the femur, which is the thigh bone and the longest bone in the human body.'
-    },
-    {
-      questionText: 'What type of cell is shown in the image?',
-      answerOptions: [
-        { answerText: 'Red Blood Cell', isCorrect: true },
-        { answerText: 'White Blood Cell', isCorrect: false },
-        { answerText: 'Neuron', isCorrect: false },
-        { answerText: 'Skin Cell', isCorrect: false },
-      ],
-      imageUrl: 'https://via.placeholder.com/600x500?text=Red+Blood+Cell',
-      explanation: 'Red blood cells (erythrocytes) are the most common type of blood cell and are responsible for delivering oxygen throughout the body.'
-    },
-    {
-      questionText: 'Which part of the brain is highlighted?',
-      answerOptions: [
-        { answerText: 'Cerebellum', isCorrect: false },
-        { answerText: 'Hypothalamus', isCorrect: false },
-        { answerText: 'Frontal Lobe', isCorrect: true },
-        { answerText: 'Brainstem', isCorrect: false },
-      ],
-      imageUrl: 'https://via.placeholder.com/600x500?text=Frontal+Lobe',
-      explanation: 'The frontal lobe is the largest lobe of the brain and is responsible for voluntary movement, expressive language, and executive functions.'
-    },
-    {
-      questionText: 'What is the condition shown in this X-ray?',
-      answerOptions: [
-        { answerText: 'Osteoporosis', isCorrect: false },
-        { answerText: 'Fracture', isCorrect: true },
-        { answerText: 'Arthritis', isCorrect: false },
-        { answerText: 'Normal bone', isCorrect: false },
-      ],
-      imageUrl: 'https://via.placeholder.com/600x500?text=Bone+Fracture',
-      explanation: 'The X-ray shows a bone fracture, which is a break in the continuity of the bone.'
-    },
-    {
-      questionText: 'Which vitamin deficiency causes this condition?',
-      answerOptions: [
-        { answerText: 'Vitamin A', isCorrect: false },
-        { answerText: 'Vitamin B12', isCorrect: false },
-        { answerText: 'Vitamin C', isCorrect: true },
-        { answerText: 'Vitamin D', isCorrect: false },
-      ],
-      imageUrl: 'https://via.placeholder.com/600x500?text=Scurvy+Symptoms',
-      explanation: 'Vitamin C deficiency causes scurvy, characterized by swollen bleeding gums, joint pain, and impaired wound healing.'
-    },
-    {
-      questionText: 'What does this EKG pattern indicate?',
-      answerOptions: [
-        { answerText: 'Normal heart rhythm', isCorrect: false },
-        { answerText: 'Atrial fibrillation', isCorrect: false },
-        { answerText: 'Myocardial infarction', isCorrect: true },
-        { answerText: 'Ventricular tachycardia', isCorrect: false },
-      ],
-      imageUrl: 'https://via.placeholder.com/600x500?text=Myocardial+Infarction+EKG',
-      explanation: 'This EKG pattern shows ST-segment elevation, which is characteristic of a myocardial infarction (heart attack).'
-    },
-    {
-      questionText: 'What is this medical device used for?',
-      answerOptions: [
-        { answerText: 'Measuring blood pressure', isCorrect: true },
-        { answerText: 'Checking blood sugar', isCorrect: false },
-        { answerText: 'Monitoring heart rate', isCorrect: false },
-        { answerText: 'Testing reflexes', isCorrect: false },
-      ],
-      imageUrl: 'https://via.placeholder.com/600x500?text=Sphygmomanometer',
-      explanation: 'This is a sphygmomanometer, a device used to measure blood pressure.'
-    },
-    {
-      questionText: 'Which respiratory condition is shown in this image?',
-      answerOptions: [
-        { answerText: 'Asthma', isCorrect: false },
-        { answerText: 'Pneumonia', isCorrect: true },
-        { answerText: 'Bronchitis', isCorrect: false },
-        { answerText: 'Tuberculosis', isCorrect: false },
-      ],
-      imageUrl: 'https://via.placeholder.com/600x500?text=Pneumonia+X-ray',
-      explanation: 'The image shows a chest X-ray of pneumonia, characterized by white opacities representing fluid in the lungs.'
-    },
-    {
-      questionText: 'What is this surgical procedure called?',
-      answerOptions: [
-        { answerText: 'Appendectomy', isCorrect: false },
-        { answerText: 'Cholecystectomy', isCorrect: false },
-        { answerText: 'Coronary bypass', isCorrect: true },
-        { answerText: 'Tonsillectomy', isCorrect: false },
-      ],
-      imageUrl: 'https://via.placeholder.com/600x500?text=Coronary+Bypass+Surgery',
-      explanation: 'Coronary bypass surgery creates new routes around narrowed and blocked arteries, allowing blood to flow more freely to heart muscle.'
-    },
-  ];
-  
-  // Select questions based on user preference
   const [questions, setQuestions] = useState([]);
-  
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Backend server base URL - this is crucial for image loading
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
+
   useEffect(() => {
-    // Select random questions based on numQuestions
-    const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
-    const selectedQuestions = shuffled.slice(0, Math.min(requestedQuestions, allQuestions.length));
-    setQuestions(selectedQuestions);
-    // Reset quiz state
+    fetchQuestions(requestedQuestions);
+  }, [requestedQuestions]);
+
+  const fetchQuestions = async (numQuestions) => {
+    setIsLoading(true);
+    setError(null);
+    
+    const apiUrl = `${BACKEND_URL}/quiz/generate/${numQuestions}`;
+    
+    console.log(`Fetching questions from: ${apiUrl}`);
+    
+    try {
+      const response = await fetch(apiUrl);
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        console.error('API response error:', errorData);
+        throw new Error(`Failed to fetch questions (Status: ${response.status})`);
+      }
+      
+      const data = await response.json();
+      console.log('Success:', data);
+      
+      // Get the questions array from the response
+      const questionList = data.questions || [];
+      
+      if (!questionList.length) {
+        throw new Error('No questions returned from the API');
+      }
+      
+      // Transform API response to component format and properly format image URLs
+      const formattedQuestions = questionList.map(questionData => {
+        // Find index of correct answer in options array
+        const correctIndex = questionData.options.findIndex(
+          option => option === questionData.correct
+        );
+        
+        // Create full image URL by prepending backend URL if needed
+        let imageUrl = questionData.image;
+        
+        // If the image path doesn't start with http:// or https://, prepend the backend URL
+        if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+          // If image path starts with '/', use it directly, otherwise add '/'
+          imageUrl = `${BACKEND_URL}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
+        }
+        
+        console.log('Original image path:', questionData.image);
+        console.log('Full image URL:', imageUrl);
+        
+        return {
+          questionText: "What does this medical image show?",
+          imageUrl: imageUrl,
+          answerOptions: questionData.options.map((option, index) => ({
+            answerText: option,
+            isCorrect: index === correctIndex
+          }))
+        };
+      });
+      
+      setQuestions(formattedQuestions);
+      resetQuiz(formattedQuestions);
+    } catch (err) {
+      console.error("Error fetching questions:", err);
+      setError("Failed to load questions. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const resetQuiz = (questionsList) => {
     setCurrentQuestion(0);
     setScore(0);
     setShowScore(false);
     setSelectedAnswer(null);
     setIsAnswerSelected(false);
     setCorrectAnswerIndex(null);
-  }, [requestedQuestions]);
+  };
 
   const handleAnswerClick = (index, isCorrect) => {
     if (isAnswerSelected) return; // Prevent multiple selections
@@ -174,21 +128,38 @@ const Quiz = () => {
   };
   
   const handleRestartQuiz = () => {
-    // Select new random questions
-    const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
-    const selectedQuestions = shuffled.slice(0, Math.min(requestedQuestions, allQuestions.length));
-    setQuestions(selectedQuestions);
-    // Reset quiz state
-    setCurrentQuestion(0);
-    setScore(0);
-    setShowScore(false);
-    setSelectedAnswer(null);
-    setIsAnswerSelected(false);
-    setCorrectAnswerIndex(null);
+    fetchQuestions(requestedQuestions);
   };
   
+  if (isLoading) {
+    return (
+      <div className="quiz-loading">
+        <div className="loading-spinner"></div>
+        <p>Loading quiz questions...</p>
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="quiz-error">
+        <p>{error}</p>
+        <button className="restart-btn" onClick={() => fetchQuestions(requestedQuestions)}>
+          Try Again
+        </button>
+      </div>
+    );
+  }
+  
   if (questions.length === 0) {
-    return <div className="quiz-loading">Loading quiz questions...</div>;
+    return (
+      <div className="quiz-loading">
+        <p>No questions available. Please try again.</p>
+        <button className="restart-btn" onClick={() => fetchQuestions(requestedQuestions)}>
+          Try Again
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -223,8 +194,12 @@ const Quiz = () => {
             <div className="quiz-image-section">
               <img 
                 src={questions[currentQuestion].imageUrl} 
-                alt={`Visual for question ${currentQuestion + 1}`} 
+                alt={`Medical image ${currentQuestion + 1}`} 
                 className="question-image"
+                onError={(e) => { 
+                  console.error("Failed to load image:", questions[currentQuestion].imageUrl);
+                  e.target.src = 'https://placehold.co/600x400?text=Image+Load+Error';
+                }}
               />
             </div>
             

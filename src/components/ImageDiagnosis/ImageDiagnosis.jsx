@@ -5,24 +5,58 @@ const ImageDiagnosis = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [diagnosis, setDiagnosis] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState(null);
+  
+  // Backend server base URL - same as in Quiz component
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
 
-  const handleImageUpload = (event) => {
+  const handleImageUpload = async (event) => {
     const file = event.target.files[0];
-    if (file) {
-      // Reset previous diagnosis
-      setDiagnosis(null);
-      setIsProcessing(true);
+    if (!file) return;
+    
+    // Reset previous diagnosis
+    setDiagnosis(null);
+    setError(null);
+    setIsProcessing(true);
+    
+    // Create a preview of the selected image
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setSelectedImage(reader.result);
+    };
+    reader.readAsDataURL(file);
+    
+    // Prepare the form data for upload
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+      // Make the API call to your backend
+      const response = await fetch(`${BACKEND_URL}/img/upload`, {
+        method: 'POST',
+        body: formData,
+      });
       
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setSelectedImage(reader.result);
-        // Simulate diagnosis processing
-        setTimeout(() => {
-          setDiagnosis('This is a sample diagnosis result. In a real application, this would be the result from your AI model. The analysis would include potential conditions identified in the image, confidence scores, and recommended next steps for the patient or healthcare provider.');
-          setIsProcessing(false);
-        }, 2000);
-      };
-      reader.readAsDataURL(file);
+      if (!response.ok) {
+        throw new Error(`Server responded with error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Image upload response:', data);
+      
+      // Extract the description from file_info
+      if (data && data.file_info && data.file_info.description) {
+        setDiagnosis(data.file_info.description);
+      } else {
+        setError('The analysis was completed but no diagnostic details were returned.');
+        console.error('Unexpected response format:', data);
+      }
+      
+    } catch (err) {
+      console.error('Error processing image:', err);
+      setError('Failed to process the image. Please try again.');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -54,6 +88,7 @@ const ImageDiagnosis = () => {
                 setSelectedImage(null); 
                 setDiagnosis(null);
                 setIsProcessing(false);
+                setError(null);
               }}
               className="new-image-btn"
             >
@@ -68,6 +103,10 @@ const ImageDiagnosis = () => {
               <div className="processing-indicator">
                 <div className="loading-spinner"></div>
                 <p>Processing image, please wait...</p>
+              </div>
+            ) : error ? (
+              <div className="diagnosis-error">
+                <p>{error}</p>
               </div>
             ) : diagnosis ? (
               <div className="diagnosis-text">

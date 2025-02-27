@@ -19,7 +19,7 @@ const Chatbot = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleSendMessage = (e) => {
+  const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!inputMessage.trim()) return;
 
@@ -29,23 +29,31 @@ const Chatbot = () => {
     setInputMessage('');
     setIsTyping(true);
 
-    // Simulate bot response with typing indicator
-    setTimeout(() => {
-      // Sample responses - in a real app, this would come from your AI backend
-      const botResponses = [
-        "I understand your concern. Based on the symptoms you've described, it could be several conditions. It's best to consult with a healthcare professional for a proper diagnosis.",
-        "That's a good question about medication. Always follow your doctor's prescribed dosage, and contact them if you experience any side effects.",
-        "Regular exercise and a balanced diet are important parts of maintaining good health. Aim for at least 150 minutes of moderate activity per week.",
-        "Sleep is essential for health. Adults typically need 7-9 hours per night. If you're having trouble sleeping, try maintaining a regular sleep schedule and avoiding screens before bed.",
-        "Staying hydrated is important. The general recommendation is about 8 glasses of water per day, but individual needs vary based on activity level and climate."
-      ];
-      
-      // Select a random response
-      const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
-      
+    // Send the message to the backend
+    try {
+      const response = await fetch('http://localhost:8000/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: inputMessage }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server responded with error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Chatbot response:', data);
+
+      // Add bot response to messages
       setIsTyping(false);
-      setMessages([...newMessages, { text: randomResponse, sender: 'bot' }]);
-    }, 1500);
+      setMessages([...newMessages, { text: data.response, sender: 'bot' }]); // Assuming the response has a 'response' field
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setIsTyping(false);
+      setMessages([...newMessages, { text: "Sorry, I couldn't process your request. Please try again.", sender: 'bot' }]);
+    }
   };
 
   return (

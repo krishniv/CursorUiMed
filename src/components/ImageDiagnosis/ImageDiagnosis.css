@@ -201,4 +201,20 @@
   .upload-section {
     padding: 24px 16px;
   }
+}
+
+/* Add these styles to your existing CSS file */
+
+.diagnosis-error {
+  background-color: #fff5f5;
+  border-radius: 6px;
+  border-left: 3px solid #e53e3e;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.diagnosis-error p {
+  color: #c53030;
+  margin: 0;
+  font-size: 0.9rem;
 } 
