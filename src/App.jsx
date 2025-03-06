@@ -4,11 +4,11 @@ import Header from './components/Header/Header';
 import Sidebar from './components/Sidebar/Sidebar';
 import Footer from './components/Footer/Footer';
 import Home from './pages/Home';
-import Login from './pages/Login';
 import Quiz from './components/Quiz/Quiz'; 
 import Chatbot from './components/Chatbot/Chatbot';
 import ImageDiagnosis from './components/ImageDiagnosis/ImageDiagnosis';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
+import LoginModal from './components/Auth/LoginModal';
 import './styles/main.css';
 
 function App() {
@@ -19,6 +19,7 @@ function App() {
   // Authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   
   // Check if user was previously logged in (using localStorage)
   useEffect(() => {
@@ -61,6 +62,14 @@ function App() {
     localStorage.removeItem('medicalAssistantUser');
   };
 
+  const openLoginModal = () => {
+    setShowLoginModal(true);
+  };
+
+  const closeLoginModal = () => {
+    setShowLoginModal(false);
+  };
+
   return (
     <Router>
       <div className={`app ${isSidebarOpen ? '' : 'sidebar-collapsed'} ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
@@ -73,16 +82,22 @@ function App() {
             isAuthenticated={isAuthenticated}
             user={user}
             onLogout={handleLogout}
+            onLoginClick={openLoginModal}
           />
           <main className="main-content">
             <Routes>
-              <Route path="/" element={<Home isAuthenticated={isAuthenticated} />} />
-              <Route path="/login" element={<Login onLogin={handleLogin} />} />
+              <Route path="/" element={<Home 
+                isAuthenticated={isAuthenticated}
+                onLoginClick={openLoginModal}
+              />} />
               <Route path="/quiz" element={<Quiz />} />
               <Route 
                 path="/chatbot" 
                 element={
-                  <ProtectedRoute isAuthenticated={isAuthenticated}>
+                  <ProtectedRoute 
+                    isAuthenticated={isAuthenticated}
+                    onLoginRequest={openLoginModal}
+                  >
                     <Chatbot />
                   </ProtectedRoute>
                 } 
@@ -90,7 +105,10 @@ function App() {
               <Route 
                 path="/diagnosis" 
                 element={
-                  <ProtectedRoute isAuthenticated={isAuthenticated}>
+                  <ProtectedRoute 
+                    isAuthenticated={isAuthenticated}
+                    onLoginRequest={openLoginModal}
+                  >
                     <ImageDiagnosis />
                   </ProtectedRoute>
                 } 
@@ -99,6 +117,13 @@ function App() {
           </main>
           <Footer isDarkMode={isDarkMode} />
         </div>
+        
+        {showLoginModal && (
+          <LoginModal 
+            onLogin={handleLogin} 
+            onClose={closeLoginModal}
+          />
+        )}
       </div>
     </Router>
   );

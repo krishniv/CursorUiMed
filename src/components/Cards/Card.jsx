@@ -2,7 +2,17 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Card.css';
 
-const Card = ({ title, description, icon, link, buttonText, isQuiz = false, requiresAuth = false, isAuthenticated = false }) => {
+const Card = ({ 
+  title, 
+  description, 
+  icon, 
+  link, 
+  buttonText, 
+  isQuiz = false, 
+  requiresAuth = false, 
+  isAuthenticated = false,
+  onLoginClick
+}) => {
   const [numQuestions, setNumQuestions] = useState(5);
   const navigate = useNavigate();
   
@@ -19,7 +29,8 @@ const Card = ({ title, description, icon, link, buttonText, isQuiz = false, requ
   const handleProtectedFeatureClick = (e) => {
     if (!isAuthenticated && requiresAuth) {
       e.preventDefault();
-      navigate('/login', { state: { from: link } });
+      // Instead of navigating, show the login modal
+      onLoginClick();
     }
   };
 

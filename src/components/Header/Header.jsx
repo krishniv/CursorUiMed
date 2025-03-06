@@ -1,15 +1,8 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import './Header.css';
 
-const Header = ({ isAuthenticated, user, onLogout }) => {
-  const navigate = useNavigate();
-  
-  const handleLogout = () => {
-    onLogout();
-    navigate('/');
-  };
-
+const Header = ({ isAuthenticated, user, onLogout, onLoginClick }) => {
   return (
     <header className="header">
       <div className="header-left">
@@ -29,16 +22,16 @@ const Header = ({ isAuthenticated, user, onLogout }) => {
                 </div>
                 <button 
                   className="logout-button"
-                  onClick={handleLogout}
+                  onClick={onLogout}
                 >
                   Logout
                 </button>
               </div>
             </>
           ) : (
-            <Link to="/login" className="login-button">
+            <button onClick={onLoginClick} className="login-button">
               Login
-            </Link>
+            </button>
           )}
         </div>
       </div>

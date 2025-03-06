@@ -1,12 +1,20 @@
 import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
-const ProtectedRoute = ({ children, isAuthenticated }) => {
-  const location = useLocation();
-  
+const ProtectedRoute = ({ children, isAuthenticated, onLoginRequest }) => {
   if (!isAuthenticated) {
-    // Redirect to login page and remember where they were trying to go
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    // Instead of redirecting, trigger the login modal
+    setTimeout(() => {
+      onLoginRequest();
+    }, 100);
+    
+    // Show a simple message instead of redirecting
+    return (
+      <div className="auth-required-message">
+        <h2>Authentication Required</h2>
+        <p>Please log in to access this feature.</p>
+      </div>
+    );
   }
   
   return children;

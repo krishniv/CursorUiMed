@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Card from '../components/Cards/Card';
 import './Home.css';
 
-const Home = ({ isAuthenticated }) => {
+const Home = ({ isAuthenticated, onLoginClick }) => {
   const cards = [
     {
       title: 'Medical Quiz',
@@ -42,6 +42,7 @@ const Home = ({ isAuthenticated }) => {
             key={card.title} 
             {...card} 
             isAuthenticated={isAuthenticated}
+            onLoginClick={onLoginClick}
           />
         ))}
       </div>

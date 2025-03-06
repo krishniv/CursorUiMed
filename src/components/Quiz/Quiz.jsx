@@ -17,7 +17,7 @@ const Quiz = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Backend server base URL - this is crucial for image loading
+  // Backend server base URL
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
 
   useEffect(() => {
@@ -33,9 +33,22 @@ const Quiz = () => {
     console.log(`Fetching questions from: ${apiUrl}`);
     
     try {
-      const response = await fetch(apiUrl);
+      // Get authentication token from localStorage
+      const user = JSON.parse(localStorage.getItem('medicalAssistantUser') || '{}');
+      const authToken = user.token || '';
+      
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        }
+      });
       
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Authentication required. Please log in again.');
+        }
         const errorData = await response.json().catch(() => null);
         console.error('API response error:', errorData);
         throw new Error(`Failed to fetch questions (Status: ${response.status})`);
@@ -84,7 +97,7 @@ const Quiz = () => {
       resetQuiz(formattedQuestions);
     } catch (err) {
       console.error("Error fetching questions:", err);
-      setError("Failed to load questions. Please try again.");
+      setError(err.message || "Failed to load questions. Please try again.");
     } finally {
       setIsLoading(false);
     }

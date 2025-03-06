@@ -29,17 +29,28 @@ const Chatbot = () => {
     setInputMessage('');
     setIsTyping(true);
 
+    // Get authentication token from localStorage
+    const user = JSON.parse(localStorage.getItem('medicalAssistantUser') || '{}');
+    const authToken = user.token || '';
+
     // Send the message to the backend
     try {
       const response = await fetch('http://localhost:8000/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
         },
-        body: JSON.stringify({ message: inputMessage }),
+        body: JSON.stringify({ 
+          message: inputMessage,
+          token: authToken // Also include token in request body
+        }),
       });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Authentication required. Please log in again.');
+        }
         throw new Error(`Server responded with error: ${response.status}`);
       }
 
@@ -48,11 +59,14 @@ const Chatbot = () => {
 
       // Add bot response to messages
       setIsTyping(false);
-      setMessages([...newMessages, { text: data.response, sender: 'bot' }]); // Assuming the response has a 'response' field
+      setMessages([...newMessages, { text: data.response, sender: 'bot' }]);
     } catch (error) {
       console.error('Error sending message:', error);
       setIsTyping(false);
-      setMessages([...newMessages, { text: "Sorry, I couldn't process your request. Please try again.", sender: 'bot' }]);
+      setMessages([...newMessages, { 
+        text: error.message || "Sorry, I couldn't process your request. Please try again.", 
+        sender: 'bot' 
+      }]);
     }
   };
 
