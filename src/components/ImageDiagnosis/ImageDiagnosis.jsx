@@ -26,30 +26,35 @@ const ImageDiagnosis = () => {
     };
     reader.readAsDataURL(file);
     
-    // Get authentication token from localStorage
+    // Get authentication token from localStorage if available (but don't require it)
     const user = JSON.parse(localStorage.getItem('medicalAssistantUser') || '{}');
     const authToken = user.token || '';
     
     // Prepare the form data for upload
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('token', authToken); // Add authentication token
+    
+    // Include token in request if available
+    if (authToken) {
+      formData.append('token', authToken);
+    }
+    
+    // Set up headers - include auth token only if it exists
+    const headers = {};
+    
+    if (authToken) {
+      headers["Authorization"] = `Bearer ${authToken}`;
+    }
     
     try {
       // Make the API call to your backend
       const response = await fetch(`${BACKEND_URL}/img/upload`, {
         method: 'POST',
         body: formData,
-        // No need to set Content-Type for FormData
-        headers: {
-          'Authorization': `Bearer ${authToken}` // Also add token as a header
-        }
+        headers: headers
       });
       
       if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Authentication required. Please log in again.');
-        }
         throw new Error(`Server responded with error: ${response.status}`);
       }
       

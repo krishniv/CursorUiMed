@@ -37,10 +37,10 @@ const LoginModal = ({ onLogin, onClose }) => {
     setIsLoading(true);
     
     try {
-      // Determine which API endpoint to use
-      const endpoint = isRegistering ? '/register' : '/login';
+      // Determine which API endpoint to use - register or token
+      const endpoint = isRegistering ? '/register' : '/token';
       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
-      
+      console.log(`Using endpoint: ${endpoint}`);
       // Prepare request data
       const requestData = isRegistering 
         ? { username, email, password }
@@ -62,15 +62,55 @@ const LoginModal = ({ onLogin, onClose }) => {
       
       const data = await response.json();
       
-      // Store token in localStorage
-      localStorage.setItem('token', data.access_token);
-      
-      // Successfully logged in
-      onLogin({ 
-        username: isRegistering ? username : email.split('@')[0],
-        email: email,
-        token: data.access_token
-      });
+      if (isRegistering) {
+        // For registration, the response should already contain the token
+        console.log('Registration successful, user created:', data.username);
+        
+        // Extract token directly from registration response
+        const token = data.access_token;
+        
+        if (!token) {
+          throw new Error('Authentication token not found in registration response');
+        }
+        
+        // Create the user data object with received username, email and token
+        const userData = {
+          username: data.username || username,
+          email: data.email || email,
+          token: token
+        };
+        
+        // Store token separately for easier access in API calls
+        localStorage.setItem('token', token);
+        // Store user data including the token
+        localStorage.setItem('medicalAssistantUser', JSON.stringify(userData));
+        
+        // Successfully registered and logged in
+        onLogin(userData);
+      } else {
+        // For login, response contains just the token
+        // Format: {"access_token": token_value, "token_type": "bearer"}
+        const token = data.access_token;
+        
+        if (!token) {
+          throw new Error('Authentication token not found in response');
+        }
+        
+        // Create user data object with the token
+        const userData = {
+          username: email.split('@')[0],
+          email: email,
+          token: token
+        };
+        
+        // Store token separately for easier access in API calls
+        localStorage.setItem('token', token);
+        // Store user data including the token
+        localStorage.setItem('medicalAssistantUser', JSON.stringify(userData));
+        
+        // Successfully logged in
+        onLogin(userData);
+      }
       
       onClose();
     } catch (err) {

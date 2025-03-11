@@ -91,28 +91,8 @@ function App() {
                 onLoginClick={openLoginModal}
               />} />
               <Route path="/quiz" element={<Quiz />} />
-              <Route 
-                path="/chatbot" 
-                element={
-                  <ProtectedRoute 
-                    isAuthenticated={isAuthenticated}
-                    onLoginRequest={openLoginModal}
-                  >
-                    <Chatbot />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/diagnosis" 
-                element={
-                  <ProtectedRoute 
-                    isAuthenticated={isAuthenticated}
-                    onLoginRequest={openLoginModal}
-                  >
-                    <ImageDiagnosis />
-                  </ProtectedRoute>
-                } 
-              />
+              <Route path="/chatbot" element={<Chatbot />} />
+              <Route path="/diagnosis" element={<ImageDiagnosis />} />
             </Routes>
           </main>
           <Footer isDarkMode={isDarkMode} />

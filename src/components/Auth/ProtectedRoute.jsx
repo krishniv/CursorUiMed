@@ -1,14 +1,19 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
 const ProtectedRoute = ({ children, isAuthenticated, onLoginRequest }) => {
-  if (!isAuthenticated) {
-    // Instead of redirecting, trigger the login modal
-    setTimeout(() => {
+  const [hasTriggeredAuth, setHasTriggeredAuth] = useState(false);
+  
+  useEffect(() => {
+    // Only trigger the login modal once when the component mounts
+    // and only if the user is not authenticated
+    if (!isAuthenticated && !hasTriggeredAuth) {
       onLoginRequest();
-    }, 100);
-    
-    // Show a simple message instead of redirecting
+      setHasTriggeredAuth(true);
+    }
+  }, [isAuthenticated, onLoginRequest, hasTriggeredAuth]);
+
+  if (!isAuthenticated) {
     return (
       <div className="auth-required-message">
         <h2>Authentication Required</h2>

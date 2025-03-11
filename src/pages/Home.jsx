@@ -20,7 +20,7 @@ const Home = ({ isAuthenticated, onLoginClick }) => {
       icon: '🤖',
       link: '/chatbot',
       buttonText: 'Start Chat',
-      requiresAuth: true
+      requiresAuth: false
     },
     {
       title: 'Image Analysis',
@@ -28,7 +28,7 @@ const Home = ({ isAuthenticated, onLoginClick }) => {
       icon: '🔬',
       link: '/diagnosis',
       buttonText: 'Upload Image',
-      requiresAuth: true
+      requiresAuth: false
     },
   ];
 

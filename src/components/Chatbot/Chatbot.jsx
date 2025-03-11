@@ -9,6 +9,7 @@ const Chatbot = () => {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
   const chatMessagesRef = useRef(null);
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
 
   // Scroll to bottom whenever messages change
   useEffect(() => {
@@ -29,28 +30,29 @@ const Chatbot = () => {
     setInputMessage('');
     setIsTyping(true);
 
-    // Get authentication token from localStorage
-    const user = JSON.parse(localStorage.getItem('medicalAssistantUser') || '{}');
-    const authToken = user.token || '';
-
+    // Get authentication token from localStorage if available (but don't require it)
+    const token = localStorage.getItem('token');
+    
+    // Set up headers - include auth token only if it exists
+    const headers = {
+      "Content-Type": "application/json"
+    };
+    
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+    
     // Send the message to the backend
     try {
-      const response = await fetch('http://localhost:8000/chat', {
+      const response = await fetch(`${BACKEND_URL}/chat`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`
-        },
+        headers: headers,
         body: JSON.stringify({ 
-          message: inputMessage,
-          token: authToken // Also include token in request body
+          message: inputMessage
         }),
       });
 
       if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Authentication required. Please log in again.');
-        }
         throw new Error(`Server responded with error: ${response.status}`);
       }
 
